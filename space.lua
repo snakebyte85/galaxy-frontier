@@ -15,7 +15,7 @@ end
 
 function space_init()
    for i=1,space.stars_count do
-      star = create_star()
+      local star = create_star()
       star.x = flr(rnd(127))
       star.y = flr(rnd(127))
       star.distance=rnd(1)
@@ -26,7 +26,7 @@ end
 function space_draw()
 
    for star in all(space.stars) do
-      color = const.colors.white
+      local color = const.colors.white
       if star.distance>0.8 then
          color=const.colors.dark_gray
       end
@@ -37,7 +37,7 @@ end
 
 function space_update()
 
-   stars_to_delete = {}
+   local stars_to_delete = {}
 
    for i,star in ipairs(space.stars) do
       star.x = star.x + (space.speed_x * (1-star.distance))
@@ -54,7 +54,7 @@ function space_update()
    end
 
    for i=1,#stars_to_delete do
-      star = create_star()
+      local star = create_star()
       if space.speed_x == 0 then
          star.x = flr(rnd(127))
          if space.speed_y > 0 then

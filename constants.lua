@@ -14,6 +14,13 @@ const={
       x=5
    },
 
+   direction={
+      right=0,
+      up=0.25,
+      left=0.5,
+      down=0.75
+   },
+
    colors={
       black=0,
       dark_blue=1,
