@@ -1,5 +1,7 @@
 const={
 
+   delta=0.1,
+
    screen={
       max_x=128,
       max_y=128

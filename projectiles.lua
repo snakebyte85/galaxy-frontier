@@ -1,13 +1,48 @@
 projectiles={}
 
-function create_laser_projectile(x,y,direction) 
+function create_laser_projectile(x,y, direction)
+
+   local projectile = {
+      x=x,
+      y=y,
+      speed=2,
+      direction=direction,
+      ttype="laser",
+      draw=function(self) 
+         local start_x = 2 * cos(self.direction+0.5)
+         local start_y = 2 * sin(self.direction+0.5)
+         local end_x = 2 * cos(self.direction)
+         local end_y = 2 * sin(self.direction)
+
+         line(self.x+start_x, self.y+start_y, 
+              self.x+end_x, self.y+end_y, 
+              const.colors.red)
+      end
+      
+   }
+
+   add(projectiles,projectile)
+
+end
+
+function create_laser_player_projectile(x,y) 
 
    local projectile = {
       x=x,
       y=y,
       speed=3,
-      direction=direction,
-      ttype="laser"
+      direction=const.direction.up,
+      ttype="laser-player",
+      draw=function(self) 
+         local start_x = 2 * cos(self.direction+0.5)
+         local start_y = 2 * sin(self.direction+0.5)
+         local end_x = 2 * cos(self.direction)
+         local end_y = 2 * sin(self.direction)
+
+         line(self.x+start_x, self.y+start_y, 
+              self.x+end_x, self.y+end_y, 
+              const.colors.green)
+      end
    }
 
    add(projectiles,projectile)
@@ -18,16 +53,7 @@ end
 function projectiles_draw()
 
    for projectile in all(projectiles) do
-      if projectile.ttype == "laser" then
-         local start_x = 2 * cos(projectile.direction+0.5)
-         local start_y = 2 * sin(projectile.direction+0.5)
-         local end_x = 2 * cos(projectile.direction)
-         local end_y = 2 * sin(projectile.direction)
-
-         line(projectile.x+start_x, projectile.y+start_y, 
-              projectile.x+end_x, projectile.y+end_y, 
-              const.colors.red)
-      end
+      projectile:draw()
    end
 
 end

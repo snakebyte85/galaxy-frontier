@@ -39,7 +39,7 @@ function player_update()
       player.moving = true
    end
    if true_btnp(const.input.o) then
-      create_laser_projectile(player.x, player.y-5, const.direction.up)
+      create_laser_player_projectile(player.x, player.y-5)
    end   
 
    if player.x - 4 < 0 then

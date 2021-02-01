@@ -1,5 +1,4 @@
 space={
-   speed_x=0,
    speed_y=1,
    stars_count=50,
    stars={},
@@ -13,54 +12,36 @@ function create_star()
       distance=0         
    }
 
-   if space.speed_x == 0 then
-      star.x = flr(rnd(127))
-      if space.speed_y > 0 then
-         star.y = 0
-      else
-         star.y = const.screen.max_y
-      end
-   elseif space.speed_y == 0 then
-      star.y = flr(rnd(127))
-      if space.speed_x > 0 then
-         star.x = 0
-      else
-         star.x = const.screen.max_x
-      end
-   else 
-      star.x = flr(rnd(127))
-      star.y = flr(rnd(127))
-   end
+   star.x = flr(rnd(127))
+   if space.speed_y > 0 then
+      star.y = 0
+   else
+      star.y = const.screen.max_y
+   end 
 
    star.distance=rnd(1)
    add(space.stars,star)
 end
 
-function create_planet(ttype)
+function create_planet(ttype,x,y)
    planet = {
-      x=0,
-      y=0,
+      x=x,
+      y=y,
       ttype=ttype
    }
 
-   if space.speed_x == 0 then
+   if planet.x == nil then
       planet.x = flr(rnd(127))
+   end
+
+   if planet.y == nil then
       if space.speed_y > 0 then
          planet.y = -16
       else
          planet.y = const.screen.max_y + 16
       end
-   elseif space.speed_y == 0 then
-      planet.y = flr(rnd(127))
-      if space.speed_x > 0 then
-         planet.x = -16
-      else
-         planet.x = const.screen.max_x + 16
-      end
-   else 
-      planet.x = flr(rnd(127))
-      planet.y = flr(rnd(127))
-   end  
+   end
+
    add(space.planets,planet)
 end
 
@@ -72,8 +53,7 @@ function space_init()
       star.distance=rnd(1)
       add(space.stars,star)
    end   
-   
-   create_planet("jupiter")
+
 end
 
 function space_draw()
@@ -93,6 +73,13 @@ function space_draw()
          spr(97,planet.x-8,planet.y-8,2,2)
       elseif planet.ttype=="jupiter" then
          spr(67,planet.x-16,planet.y-16,4,4)
+      elseif planet.ttype=="sun" then
+         spr(71,planet.x-16,planet.y-16,4,4)
+      elseif planet.ttype=="supernova" then
+         pal(const.colors.yellow, const.colors.blue)
+         pal(const.colors.orange, const.colors.dark_blue)
+         spr(71,planet.x-16,planet.y-16,4,4)
+         pal()
       end
    end
 end
@@ -103,7 +90,6 @@ function space_update()
    local stars_to_delete = {}
 
    for i,star in ipairs(space.stars) do
-      star.x = star.x + (space.speed_x * (1-star.distance))
       star.y = star.y + (space.speed_y * (1-star.distance))
 
       if star.x > const.screen.max_x or star.x < 0 or         
@@ -125,12 +111,16 @@ function space_update()
    local planets_to_delete = {}
 
    for i,planet in ipairs(space.planets) do
-      planet.x = planet.x + (space.speed_x * 0.05)
-      planet.y = planet.y + (space.speed_y * 0.05)
 
-      if planet.x > const.screen.max_x + 16 or planet.x < -32 or         
-         planet.y > const.screen.max_y + 16 or planet.y < -32 then
-         add(planets_to_delete, i)
+      if(planet.ttype ~= "sun" and
+         planet.ttype ~= "supernova") then
+
+         planet.y = planet.y + (space.speed_y * 0.05)
+
+         if planet.x > const.screen.max_x + 16 or planet.x < -32 or         
+            planet.y > const.screen.max_y + 16 or planet.y < -32 then
+            add(planets_to_delete, i)
+         end
       end
    end
 
