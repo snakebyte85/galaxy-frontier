@@ -63,7 +63,7 @@ function projectiles_update()
 
    local projs_to_delete = {}
 
-   for i,projectile in ipairs(projectiles) do
+   for projectile in all(projectiles) do
       local mov_x = projectile.speed * cos(projectile.direction)
       local mov_y = projectile.speed * sin(projectile.direction)
       projectile.x = projectile.x + mov_x
@@ -71,11 +71,11 @@ function projectiles_update()
 
       if projectile.x > const.screen.max_x or projectile.x < 0 or         
          projectile.y > const.screen.max_y or projectile.y < 0 then
-         add(projs_to_delete, i)
+         add(projs_to_delete, projectile)
       end
    end
 
-   for i in all(projs_to_delete) do
-      deli(projectiles,i)
+   for projectile_to_delete in all(projs_to_delete) do
+      del(projectiles,projectile_to_delete)
    end
 end

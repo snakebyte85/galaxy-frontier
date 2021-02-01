@@ -8,6 +8,7 @@ function create_enemy_raider(x,y,waypoints)
       y=y,
       waypoints=waypoints,
       speed=1,
+      hitbox={x1=-4,y1=-4,x2=3,y2=2},
       ttype = "raider",
       update=function(self)
          enemy_update_waypoints(self)
@@ -28,6 +29,7 @@ function create_enemy_drone(x,y,waypoints)
       y=y,
       waypoints=waypoints,
       speed=1,
+      hitbox={x1=-4,y1=-4,x2=3,y2=3},
       ttype= "drone",
       rotated=false,
       update=function(self) 
@@ -58,6 +60,7 @@ function create_enemy_frigate(x,y,waypoints)
       y=y,
       waypoints=waypoints,
       speed=0.5,
+      hitbox={x1=-10,y1=-4,x2=9,y2=2},
       ttype = "frigate",
       update=function(self)
          enemy_update_waypoints(self)
@@ -76,6 +79,7 @@ function create_enemy_bomber(x,y,waypoints)
       y=y,
       waypoints=waypoints,
       speed=1,
+      hitbox={x1=-4,y1=-4,x2=3,y2=3},
       ttype = "bomber",
       update=function(self)
          enemy_update_waypoints(self)
@@ -133,16 +137,22 @@ end
 function enemies_draw()
    for enemy in all(enemies) do
       enemy:draw()
-      if global.debug and enemy.waypoints then
-         if #enemy.waypoints ~= 0 then
-            line(enemy.x, enemy.y,
-                 enemy.waypoints[1].x, enemy.waypoints[1].y,
-                 const.colors.red)
-            for i=1,#enemy.waypoints do
-               if enemy.waypoints[i+1] then
-                  line(enemy.waypoints[i].x, enemy.waypoints[i].y,
-                       enemy.waypoints[i+1].x, enemy.waypoints[i+1].y,
-                       const.colors.red)
+      if global.debug then
+         pset(enemy.x,enemy.y,const.colors.red)
+         rect(enemy.x+enemy.hitbox.x1, enemy.y+enemy.hitbox.y1,
+           enemy.x+enemy.hitbox.x2, enemy.y+enemy.hitbox.y2,
+           const.colors.blue)
+         if enemy.waypoints then
+            if #enemy.waypoints ~= 0 then
+               line(enemy.x, enemy.y,
+                    enemy.waypoints[1].x, enemy.waypoints[1].y,
+                    const.colors.green)
+               for i=1,#enemy.waypoints do
+                  if enemy.waypoints[i+1] then
+                     line(enemy.waypoints[i].x, enemy.waypoints[i].y,
+                          enemy.waypoints[i+1].x, enemy.waypoints[i+1].y,
+                          const.colors.green)
+                  end
                end
             end
          end

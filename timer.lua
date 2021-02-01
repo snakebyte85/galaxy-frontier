@@ -8,7 +8,8 @@ function create_timer(delay, func, args, loop)
       time_exec = time() + delay,
       func = func,
       args = args,
-      loop = loop or false
+      loop = loop or false,
+      passed = false
    }
 
    add(timers, timer)
@@ -36,6 +37,7 @@ function timers_update()
             timer.time_exec = time() + timer.time
          else
             add(timers_to_delete, timer)
+            timer.passed = true
          end
       end
    end

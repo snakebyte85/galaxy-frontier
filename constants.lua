@@ -20,7 +20,11 @@ const={
       right=0,
       up=0.25,
       left=0.5,
-      down=0.75
+      down=0.75,
+      up_right = 0.125,
+      up_left = 0.375,
+      down_left = 0.625,
+      down_right = 0.875      
    },
 
    colors={

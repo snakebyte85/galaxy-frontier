@@ -8,11 +8,12 @@ __lua__
 #include enemy.lua
 #include player.lua
 #include space.lua
+#include particles.lua
 
 global={
    step=0,
    debug=false,
-   log=true
+   log=false
 }
 
 function _init()
@@ -42,6 +43,7 @@ function _update60()
    player_update()
    enemies_update()
    projectiles_update()
+   particles_update()
    global.step = global.step + 1
 end
 
@@ -54,6 +56,7 @@ function _draw()
    enemies_draw()
    player_draw()
    projectiles_draw()
+   particles_draw()
 end
 
 __gfx__

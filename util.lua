@@ -46,6 +46,37 @@ function calculate_waypoints_bc(x1,y1,x2,y2,x3,y3,number_of_points)
    return waypoints_bc
 end
 
+function translate_hitbox(x,y,hitbox)
+
+   translated_hitbox = {
+      x1=hitbox.x1,
+      y1=hitbox.y1,
+      x2=hitbox.x2,
+      y2=hitbox.y2
+   }
+
+   translated_hitbox.x1 += x
+   translated_hitbox.y1 += y
+   translated_hitbox.x2 += x
+   translated_hitbox.y2 += y
+
+   return translated_hitbox
+
+end
+
+function hitboxes_collision_check(hitbox1, hitbox2)
+   local c1 = hitbox1.x1 <= hitbox2.x2
+   local c2 = hitbox1.x2 >= hitbox2.x1
+   local c3 = hitbox1.y1 >= hitbox2.y2
+   local c4 = hitbox1.y2 <= hitbox2.y1
+   return c1 and c2 and c3 and c4
+end
+
+function hitbox_point_collision_check(x,y,hitbox) 
+   return x >= hitbox.x1 and x <= hitbox.x2 and
+      y >= hitbox.y1 and y <= hitbox.y2
+end
+
 function tostring(any)
     if type(any)=="function" then 
         return "function" 
