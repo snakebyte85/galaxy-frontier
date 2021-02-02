@@ -8,10 +8,11 @@ function create_enemy_raider(x,y,waypoints)
       y=y,
       waypoints=waypoints,
       speed=1,
-      hitbox={x1=-4,y1=-4,x2=3,y2=2},
+      health=5,
+      hitbox={x1=-4,y1=-4,x2=3,y2=2,ttype="rect"},
       ttype = "raider",
       update=function(self)
-         enemy_update_waypoints(self)
+         update_regular_enemy(self)
       end,
       draw=function(self)
          spr(16, self.x-4, self.y-4)
@@ -29,11 +30,12 @@ function create_enemy_drone(x,y,waypoints)
       y=y,
       waypoints=waypoints,
       speed=1,
-      hitbox={x1=-4,y1=-4,x2=3,y2=3},
+      health=10,
+      hitbox={x1=-4,y1=-4,x2=3,y2=3,ttype="rect"},
       ttype= "drone",
       rotated=false,
       update=function(self) 
-         enemy_update_waypoints(self)
+         update_regular_enemy(self)
       end,
       draw=function(self)
          local sprite_number=17
@@ -60,10 +62,11 @@ function create_enemy_frigate(x,y,waypoints)
       y=y,
       waypoints=waypoints,
       speed=0.5,
-      hitbox={x1=-10,y1=-4,x2=9,y2=2},
+      health=20,
+      hitbox={x1=-10,y1=-4,x2=9,y2=2,ttype="rect"},
       ttype = "frigate",
       update=function(self)
-         enemy_update_waypoints(self)
+         update_regular_enemy(self)
       end,
       draw=function(self)
          spr(32, self.x-12, self.y-4, 3,1)
@@ -79,10 +82,11 @@ function create_enemy_bomber(x,y,waypoints)
       y=y,
       waypoints=waypoints,
       speed=1,
-      hitbox={x1=-4,y1=-4,x2=3,y2=3},
+      health=9,
+      hitbox={x1=-4,y1=-4,x2=3,y2=3,ttype="rect"},
       ttype = "bomber",
       update=function(self)
-         enemy_update_waypoints(self)
+         update_regular_enemy(self)
       end,
       draw=function(self)
          spr(19, self.x-4, self.y-4)
@@ -92,7 +96,25 @@ function create_enemy_bomber(x,y,waypoints)
    add(enemies, bomber)
 end
 
-function enemy_update_waypoints(enemy)
+function enemy_hit(enemy, damage)
+
+   enemy.health = enemy.health - damage
+
+   if enemy.health <= 0 then
+      -- TODO
+      del(enemies, enemy)
+   else       
+      enemy.hit = true
+      create_timer(0.1, 
+                   function(this_enemy) 
+                      this_enemy.hit = false
+                   end,
+                   {enemy}
+      )
+   end
+end
+
+function update_regular_enemy(enemy)
 
    if enemy.waypoints ~= nil and #enemy.waypoints ~= 0 then
 
@@ -136,12 +158,20 @@ end
 
 function enemies_draw()
    for enemy in all(enemies) do
+      if enemy.hit then
+         pal_all_white()
+      end
       enemy:draw()
+      if enemy.hit then
+         pal()
+      end
       if global.debug then
          pset(enemy.x,enemy.y,const.colors.red)
-         rect(enemy.x+enemy.hitbox.x1, enemy.y+enemy.hitbox.y1,
-           enemy.x+enemy.hitbox.x2, enemy.y+enemy.hitbox.y2,
-           const.colors.blue)
+         if enemy.hitbox ~= nil and enemy.hitbox.ttype == "rect" then
+            rect(enemy.x+enemy.hitbox.x1, enemy.y+enemy.hitbox.y1,
+                 enemy.x+enemy.hitbox.x2, enemy.y+enemy.hitbox.y2,
+                 const.colors.blue)
+         end
          if enemy.waypoints then
             if #enemy.waypoints ~= 0 then
                line(enemy.x, enemy.y,

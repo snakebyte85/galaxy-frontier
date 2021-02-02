@@ -13,7 +13,7 @@ __lua__
 global={
    step=0,
    debug=false,
-   log=false
+   log=true
 }
 
 function _init()
@@ -44,6 +44,10 @@ function _update60()
    enemies_update()
    projectiles_update()
    particles_update()
+
+   player_check_collision()
+   player_projectiles_check_collision()
+
    global.step = global.step + 1
 end
 

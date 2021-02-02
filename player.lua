@@ -2,9 +2,12 @@ player={
    x=0,
    y=0,
    speed = 0.5,
-   moving=false,
    direction=nil,
-   hitbox={x1=-4,y1=-4,x2=3,y2=2},
+   lives=3,
+   health=3,
+   hitbox={x1=-4,y1=-4,x2=3,y2=2,ttype="rect"},
+   moving=false,
+   invincible=false,
    sprites={
       idle=1,
       moving={2,3}
@@ -14,9 +17,47 @@ player={
 function player_init()
 
    player.x = 30
-   player.y = 30
+   player.y = 80
    player.moving = false
 
+end
+
+function player_check_collision()
+
+   if not player.invincible then
+
+      local hit_by_enemy = false
+      for enemy in all(enemies) do      
+         if entities_collision_check(player,enemy) then
+            player_hit()
+            hit_by_enemy = true
+            break
+         end   
+      end
+
+      if not hit_by_enemy then
+         for enemy_projectile in all(enemy_projectiles) do      
+            if entities_collision_check(player,enemy_projectile) then
+               player_hit()
+               del(projectiles, enemy_projectile)
+               del(enemy_projectiles, enemy_projectile)
+               break
+            end   
+         end
+      end
+   end
+end
+
+function player_hit()
+   player.health = player.health - 1
+   if player.health == 0 then
+      -- TODO
+   end
+   player.invincible = true
+   create_timer(3,
+                function()
+                   player.invincible = false
+                end)
 end
 
 function player_update()
@@ -91,14 +132,17 @@ end
 
 function player_draw()
 
-   sprite_number = 0
+   local sprite_number = 0
    if not player.moving then
       sprite_number = player.sprites.idle
    else
       sprite_number = player.sprites.moving[flr(flr(time() / 0.2)%#player.sprites.moving)+1]
    end
 
-   spr(sprite_number, player.x-4, player.y-4)
+   if not player.invincible or
+      flr(flr(time() / 0.05)% 2) == 1 then
+      spr(sprite_number, player.x-4, player.y-4)
+   end
 
    if global.debug then
       pset(player.x,player.y,const.colors.red)
