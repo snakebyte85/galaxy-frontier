@@ -5,10 +5,21 @@ particle_class = {
       y=0,
       direction=nil,
       pattern="line",
+      time_of_birth=nil,
+      life_time=nil,
       time_of_death=nil,
       speed=2,
       acceleration=0,
       color=const.colors.white,
+      sprite_number=nil,
+      sprite_offset={x=0,y=0},
+      sprite_size={w=1,h=1},
+      init=function(self)
+         self.time_of_birth=time()
+         if self.life_time then
+            self.time_of_death=time() + self.life_time
+         end
+      end,
       dispose=function(self)
          del(particles,self)
       end,
@@ -44,12 +55,26 @@ particle_class = {
          end
       end,
       draw=function(self)         
-         pset(self.x,self.y,self.color)
+         if self.sprite_number ~= nil then
+            spr(self.sprite_number, 
+             self.x+self.sprite_offset.x, 
+             self.y+self.sprite_offset.y,
+             self.sprite_size.w,
+             self.sprite_size.h)
+         else 
+            pset(self.x,self.y,self.color)
+         end
       end,
       new=function(self,o)
          self.__index = self
          o=setmetatable(o or {}, self)
          add(particles,o)
+         o:init()
+         return o
+      end,
+      new_class=function(self,o)
+         self.__index = self
+         o=setmetatable(o or {}, self)
          return o
       end
 }
@@ -63,7 +88,7 @@ function create_particle_explosion(x,y)
          y=y,
          direction=direction,
          pattern="line",
-         time_of_death=time()+0.8,      
+         life_time=0.8,      
          speed=random(0.4,0.8),
          acceleration=-random(0.01,0.02),
          color=const.colors.dark_blue
@@ -76,7 +101,9 @@ function particles_update()
 
    for particle in all(particles) do
       
-      if particle.time_of_death ~=nil and time() > particle.time_of_death then
+      if (particle.time_of_death ~=nil and time() > particle.time_of_death) or
+         (particle.x > const.screen.max_x + 32 or particle.x < -32 or
+          particle.y > const.screen.max_y + 32 or particle.y < -32) then
          particle:dispose()
       else
          particle:update()

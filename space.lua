@@ -5,127 +5,92 @@ space={
    planets={}
 }
 
-function create_star()
-   star = {
-      x=0,
-      y=0,
-      distance=0         
-   }
+function create_star(x,y)
 
-   star.x = flr(rnd(127))
-   if space.speed_y > 0 then
-      star.y = 0
-   else
-      star.y = const.screen.max_y
-   end 
+   local distance = rnd(1)
+   local color = const.colors.white
+   if distance > 0.8 then
+      color=const.colors.dark_gray
+   elseif distance > 0.4 then
+      color=const.colors.light_gray
+   end
+   local speed = space.speed_y * (1-distance)
 
-   star.distance=rnd(1)
-   add(space.stars,star)
+   particle_class:new({
+         x=x or flr(rnd(127)),
+         y=y or 0,
+         speed=speed,
+         direction=const.direction.down,
+         color=color,
+         init=function(self)
+            particle_class.init(self)
+            add(space.stars,self)
+         end,
+         dispose=function(self)
+            particle_class.dispose(self)
+            del(space.stars,self)
+            create_star()
+         end
+   })
+
 end
 
-function create_planet(ttype,x,y)
-   planet = {
-      x=x,
-      y=y,
-      ttype=ttype
-   }
-
-   if planet.x == nil then
-      planet.x = flr(rnd(127))
-   end
-
-   if planet.y == nil then
-      if space.speed_y > 0 then
-         planet.y = -16
-      else
-         planet.y = const.screen.max_y + 16
+particle_planet_class=particle_class:new_class({
+      speed=space.speed_y * 0.05,
+      direction=const.direction.down,
+      init=function(self)
+         particle_class.init(self)
+         add(space.planets,self)
+      end,
+      dispose=function(self)
+         particle_class.dispose(self)
+         del(space.planets,self)
+         create_star()
       end
-   end
+})
 
-   add(space.planets,planet)
-end
+particle_earth_class=particle_planet_class:new_class({      
+      sprite_number=65,
+      sprite_offset={x=-8,y=-8},
+      sprite_size={w=2,h=2}
+})
+
+particle_moon_class=particle_planet_class:new_class({
+      speed=space.speed_y * 0.05,
+      direction=const.direction.down,
+      sprite_number=97,
+      sprite_offset={x=-8,y=-8},
+      sprite_size={w=2,h=2}
+})
+
+particle_jupiter_class=particle_planet_class:new_class({
+      speed=space.speed_y * 0.05,
+      direction=const.direction.down,
+      sprite_number=67,
+      sprite_offset={x=-16,y=-16},
+      sprite_size={w=4,h=4}
+})
+
+particle_sun_class=particle_planet_class:new_class({      
+      speed=0,
+      sprite_number=71,
+      sprite_offset={x=-16,y=-16},
+      sprite_size={w=4,h=4}
+})
+
+particle_supernova_class=particle_sun_class:new_class({
+      draw=function(self)
+         pal(const.colors.yellow, const.colors.blue)
+         pal(const.colors.orange, const.colors.dark_blue)
+         particle_sun_class.draw(self)
+         pal()
+      end
+})
+
 
 function space_init()
    for i=1,space.stars_count do
-      local star = {}
-      star.x = flr(rnd(127))
-      star.y = flr(rnd(127))
-      star.distance=rnd(1)
-      add(space.stars,star)
+      create_star(flr(rnd(127)), flr(rnd(127)))
    end   
-
 end
 
-function space_draw()
-
-   for star in all(space.stars) do
-      local color = const.colors.white
-      if star.distance>0.8 then
-         color=const.colors.dark_gray
-      end
-      pset(star.x,star.y,color)
-   end
-
-   for planet in all(space.planets) do
-      if planet.ttype=="earth" then         
-         spr(65,planet.x-8,planet.y-8,2,2)
-      elseif planet.ttype=="moon" then
-         spr(97,planet.x-8,planet.y-8,2,2)
-      elseif planet.ttype=="jupiter" then
-         spr(67,planet.x-16,planet.y-16,4,4)
-      elseif planet.ttype=="sun" then
-         spr(71,planet.x-16,planet.y-16,4,4)
-      elseif planet.ttype=="supernova" then
-         pal(const.colors.yellow, const.colors.blue)
-         pal(const.colors.orange, const.colors.dark_blue)
-         spr(71,planet.x-16,planet.y-16,4,4)
-         pal()
-      end
-   end
-end
-
-
-function space_update()
-
-   local stars_to_delete = {}
-
-   for i,star in ipairs(space.stars) do
-      star.y = star.y + (space.speed_y * (1-star.distance))
-
-      if star.x > const.screen.max_x or star.x < 0 or         
-         star.y > const.screen.max_y or star.y < 0 then
-         add(stars_to_delete, i)
-      end
-   end
-
-   for i in all(stars_to_delete) do
-      deli(space.stars,i)
-   end
-
-   if #space.stars < space.stars_count then
-      for i=1,space.stars_count-#space.stars do
-         create_star()      
-      end
-   end
-
-   local planets_to_delete = {}
-
-   for i,planet in ipairs(space.planets) do
-
-      if(planet.ttype ~= "sun" and
-         planet.ttype ~= "supernova") then
-
-         planet.y = planet.y + (space.speed_y * 0.05)
-
-         if planet.x > const.screen.max_x + 16 or planet.x < -32 or         
-            planet.y > const.screen.max_y + 16 or planet.y < -32 then
-            add(planets_to_delete, i)
-         end
-      end
-   end
-
-   for i in all(planets_to_delete) do
-      deli(space.planets,i)
-   end
-   
-end

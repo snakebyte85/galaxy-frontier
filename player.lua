@@ -101,7 +101,7 @@ function player_update()
    end
 
    if true_btnp(const.input.o) then
-      create_laser_player_projectile(player.x, player.y-5)
+      player_laser_projectile_class:new({x=player.x,y=player.y})
    end   
 
    if player.moving == true and
@@ -116,7 +116,7 @@ function player_update()
          y=player.y+3,
          direction=player.direction+0.5,
          pattern="wave",
-         time_of_death=time()+0.8,      
+         life_time=0.8,      
          speed=0.2,
          color=color
       }

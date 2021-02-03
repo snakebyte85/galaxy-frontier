@@ -7,13 +7,14 @@ __lua__
 #include projectiles.lua
 #include enemy.lua
 #include player.lua
-#include space.lua
 #include particles.lua
+#include space.lua
+
 
 global={
    step=0,
    debug=false,
-   log=true
+   log=false
 }
 
 function _init()
@@ -30,18 +31,21 @@ function _init()
                           {x=63,y=10,  bc={x=0,y=0,num=10} }
                           }
    })
+   enemy_raider_class:new({x=63,y=63})                          
    enemy_drone_class:new({x=20,y=20})                          
+   enemy_drone_class:new({x=40,y=40})                          
    enemy_frigate_class:new({x=30,y=30})
    enemy_bomber_class:new({x=100,y=100})
-   create_planet("sun",50,50)
-   create_planet("supernova",100,60)
-   create_planet("moon")
+   particle_sun_class:new({x=30,y=100})
+   particle_supernova_class:new({x=50,y=50})
+   particle_earth_class:new({x=10, y=-10})
+   particle_moon_class:new({x=40, y=-10})
+   particle_jupiter_class:new({x=80, y=-10})
 end
 
 function _update60()
    timers_update()
    true_btnp_update()
-   space_update()
    player_update()
    enemies_update()
    projectiles_update()
@@ -58,11 +62,10 @@ function _draw()
    if global.debug then
       rect(0,0,const.screen.max_x-1,const.screen.max_y-1, const.colors.red)
    end
-   space_draw()
+   particles_draw()
    enemies_draw()
    player_draw()
    projectiles_draw()
-   particles_draw()
 end
 
 __gfx__

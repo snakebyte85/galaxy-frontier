@@ -172,6 +172,7 @@ function enemies_draw()
       end
       if global.debug then
          pset(enemy.x,enemy.y,const.colors.red)
+         print(enemy.health,enemy.x,enemy.y-8,const.colors.red)
          if enemy.hitbox ~= nil and enemy.hitbox.ttype == "rect" then
             rect(enemy.x+enemy.hitbox.x1, enemy.y+enemy.hitbox.y1,
                  enemy.x+enemy.hitbox.x2, enemy.y+enemy.hitbox.y2,
