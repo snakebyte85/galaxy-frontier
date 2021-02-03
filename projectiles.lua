@@ -98,7 +98,7 @@ function player_projectiles_check_collision()
    for player_projectile in all(player_projectiles) do
       for enemy in all(enemies) do
          if entities_collision_check(player_projectile, enemy) then
-            enemy_hit(enemy, player_projectile.damage)
+            enemy:on_hit(player_projectile.damage)
             del(projectiles, player_projectile)
             del(player_projectiles, player_projectile)
             break

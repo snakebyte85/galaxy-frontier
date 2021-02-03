@@ -1,118 +1,69 @@
 enemies = {}
 
+enemy_class = {
+   x=0,
+   y=0,
+   waypoints={},
+   speed=1,
+   health=5,
+   hitbox={},
+   ttype=nil,
+   sprite_number=nil,
+   sprite_size={w=1,h=1},
+   sprite_offset={x=-4,y=-4},
+   timers={},
+   hit=false,
+   init=function(self)
 
-function create_enemy_raider(x,y,waypoints) 
+   end,
+   on_hit=function(self,damage) 
+      self.health = self.health - damage
 
-   local raider = {
-      x=x,
-      y=y,
-      waypoints=waypoints,
-      speed=1,
-      health=5,
-      hitbox={x1=-4,y1=-4,x2=3,y2=2,ttype="rect"},
-      ttype = "raider",
-      update=function(self)
-         update_regular_enemy(self)
-      end,
-      draw=function(self)
-         spr(16, self.x-4, self.y-4)
+      if self.health <= 0 then         
+         self:dead()         
+      else       
+         self.hit = true
+         local timer = create_timer(0.1, 
+                      function(this_enemy) 
+                         this_enemy.hit = false
+                      end,
+                      {self})
+         add(timers,timer)         
       end
-   }
-
-   add(enemies, raider)
-
-end
-
-function create_enemy_drone(x,y,waypoints)
-
-   local drone = {
-      x=x,
-      y=y,
-      waypoints=waypoints,
-      speed=1,
-      health=10,
-      hitbox={x1=-4,y1=-4,x2=3,y2=3,ttype="rect"},
-      ttype= "drone",
-      rotated=false,
-      update=function(self) 
-         update_regular_enemy(self)
-      end,
-      draw=function(self)
-         local sprite_number=17
-         if not self.rotated then
-            sprite_number = 18
-         end
-         spr(sprite_number, self.x-4, self.y-4)
+   end,
+   dead=function(self)
+      create_particle_explosion(self.x,self.y)
+      self:dispose()
+   end,
+   dispose=function(self)
+      for timer in all(timers) do
+         stop_timer(timer)
       end
-   }
-
-   drone.timer = create_timer(2,
-                              function(this) 
-                                 this.rotated = not this.rotated
-                              end,
-                              {drone},
-                              true)
-
-   add(enemies, drone)
-end
-
-function create_enemy_frigate(x,y,waypoints)
-   local frigate = {
-      x=x,
-      y=y,
-      waypoints=waypoints,
-      speed=0.5,
-      health=20,
-      hitbox={x1=-10,y1=-4,x2=9,y2=2,ttype="rect"},
-      ttype = "frigate",
-      update=function(self)
-         update_regular_enemy(self)
-      end,
-      draw=function(self)
-         spr(32, self.x-12, self.y-4, 3,1)
-      end
-   }
-
-   add(enemies, frigate)
-end
-
-function create_enemy_bomber(x,y,waypoints)
-   local bomber = {
-      x=x,
-      y=y,
-      waypoints=waypoints,
-      speed=1,
-      health=9,
-      hitbox={x1=-4,y1=-4,x2=3,y2=3,ttype="rect"},
-      ttype = "bomber",
-      update=function(self)
-         update_regular_enemy(self)
-      end,
-      draw=function(self)
-         spr(19, self.x-4, self.y-4)
-      end
-   }
-
-   add(enemies, bomber)
-end
-
-function enemy_hit(enemy, damage)
-
-   enemy.health = enemy.health - damage
-
-   if enemy.health <= 0 then
-      -- TODO
-      del(enemies, enemy)
-   else       
-      enemy.hit = true
-      create_timer(0.1, 
-                   function(this_enemy) 
-                      this_enemy.hit = false
-                   end,
-                   {enemy}
-      )
+      del(enemies,self)
+   end,
+   update=function(self)
+      update_regular_enemy(self)
+   end,
+   draw=function(self)
+      spr(self.sprite_number, 
+          self.x+self.sprite_offset.x, 
+          self.y+self.sprite_offset.y,
+          self.sprite_size.w,
+          self.sprite_size.h)
+   end,
+   new=function(self,o)
+      self.__index = self
+      o=setmetatable(o or {}, self)
+      o:init()
+      add(enemies,o)
+      return o
+   end,
+   new_class=function(self,o)
+      self.__index = self
+      o=setmetatable(o or {}, self)
+      return o
    end
-end
+}
 
 function update_regular_enemy(enemy)
 
@@ -155,6 +106,60 @@ function update_regular_enemy(enemy)
       enemy.y = enemy.y + mov_y      
    end
 end
+
+enemy_raider_class = enemy_class:new_class({
+      speed=1,
+      health=5,
+      hitbox={x1=-4,y1=-4,x2=3,y2=2,ttype="rect"},
+      ttype = "raider",
+      sprite_number=16
+})
+
+enemy_drone_class= enemy_class:new_class({
+      speed=1,
+      health=10,
+      hitbox={x1=-4,y1=-4,x2=3,y2=3,ttype="rect"},
+      ttype= "drone",
+      sprite_number=17,
+      rotated=false,
+      init=function(self)
+         local timer = create_timer(2,
+                                    function(this) 
+                                       this.rotated = not this.rotated                                 
+                                       if this.rotated then
+                                          this.sprite_number = 17
+                                       else
+                                          this.sprite_number = 18
+                                       end
+                                    end,
+                                    {self},
+                                    true)
+
+         add(self.timers,timer)
+      end
+})
+
+enemy_frigate_class = enemy_class:new_class({
+      speed=0.5,
+      health=20,
+      hitbox={x1=-10,y1=-4,x2=9,y2=2,ttype="rect"},
+      ttype = "frigate",
+      sprite_number=32,
+      sprite_offset={x=-12,y=-4},
+      sprite_size={w=3,h=1}
+})
+
+
+enemy_bomber_class=enemy_class:new_class({
+      x=x,
+      y=y,
+      waypoints=waypoints,
+      speed=1,
+      health=9,
+      hitbox={x1=-4,y1=-4,x2=3,y2=3,ttype="rect"},
+      ttype = "bomber",
+      sprite_number=19
+})
 
 function enemies_draw()
    for enemy in all(enemies) do

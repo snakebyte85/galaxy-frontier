@@ -120,6 +120,10 @@ function pal_all_white()
    end
 end
 
+function random(min, max)
+   return min + rnd(max-min)
+end
+
 function tostring(any)
     if type(any)=="function" then 
         return "function" 

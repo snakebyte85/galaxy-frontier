@@ -21,16 +21,18 @@ function _init()
    space_init()
    player_init()
    true_btnp_init()
-   create_enemy_raider(63,-10,{
+   enemy_raider_class:new({x=63,y=-10,
+                     waypoints={
                           {x=63,y=10},
                           {x=118,y=63, bc={x=128,y=0,num=10} },
                           {x=63,y=118, bc={x=128,y=128,num=10} },
                           {x=10,y=63,  bc={x=0,y=128,num=10} },
                           {x=63,y=10,  bc={x=0,y=0,num=10} }
+                          }
    })
-   create_enemy_drone(20,20)
-   create_enemy_frigate(30,30)
-   create_enemy_bomber(100,100)
+   enemy_drone_class:new({x=20,y=20})                          
+   enemy_frigate_class:new({x=30,y=30})
+   enemy_bomber_class:new({x=100,y=100})
    create_planet("sun",50,50)
    create_planet("supernova",100,60)
    create_planet("moon")

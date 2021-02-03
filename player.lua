@@ -107,8 +107,20 @@ function player_update()
    if player.moving == true and
       (player.timer_ember_cooldown == nil or
        player.timer_ember_cooldown.passed) then
-          create_particle_ember(player.x, player.y+3,player.direction+0.5)
-          player.timer_ember_cooldown = create_timer(0.5)      
+      local color = const.colors.yellow
+      if rnd(2) > 1 then
+         color=const.colors.orange
+      end
+      particle_class:new{
+         x=player.x,
+         y=player.y+3,
+         direction=player.direction+0.5,
+         pattern="wave",
+         time_of_death=time()+0.8,      
+         speed=0.2,
+         color=color
+      }
+      player.timer_ember_cooldown = create_timer(0.1)      
    end
 
    if player.x - 4 < 0 then
