@@ -154,6 +154,7 @@ function player_draw()
       rect(player.x+player.hitbox.x1, player.y+player.hitbox.y1,
            player.x+player.hitbox.x2, player.y+player.hitbox.y2,
            const.colors.blue)
+      
    end
 
 end

@@ -95,4 +95,14 @@ function space_init()
    end   
 end
 
+function space_clear()
+   for star in all(space.stars) do
+      star:dispose()
+   end
+
+   for planet in all(space.planets) do
+      planet:dispose()
+   end
+end
+
 

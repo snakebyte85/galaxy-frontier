@@ -25,9 +25,10 @@ function splash_show_title()
    splash_title_letters = splash_title_letters + 1
    create_timer(0.1,function() 
                    splash_title_letters = splash_title_letters + 1
-   end, {}, 12)
-   create_timer(2,function() 
-                   change_state("game",true)
+   end, {}, 13, function()
+                   create_timer(1,function()
+                                   change_state("title","wipe_to_black")
+                   end)
    end)
 end
 

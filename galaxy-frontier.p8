@@ -35,26 +35,58 @@ global={
          draw=splash_draw
       }   
    },
-   transition_track=0,
-   transition_end=false
+   transition_step=0,
+   transition_reset_screen=false
 }
 
-function change_state(new_state, transition)
-   if not transition then
-      global.state=new_state
-      global.states[new_state].init()
-   else 
-      global.transition_track=0
-      global.transition_timer = create_timer(0.01,function() 
-                      global.transition_track = global.transition_track + 1
-      end, {}, 64)
-      create_timer(1,function()
-                      stop_timer(global.transition_timer)
-                      global.transition_end=true
-                      global.transition_track=0
+function change_state(new_state, transition_type, func, args)
+
+   args = args or {}
+
+   if transition_type == "wipe_to_black" then
+      global.transition_step=0
+      create_timer(0.05,function() 
+                      global.transition_step = global.transition_step + 1
+      end, {}, 64, function()                
+                      if func ~= nil then
+                         func(unpack(args))
+                      end
+                      global.transition_step=0
+                      global.transition_reset_screen=true
                       global.state=new_state
                       global.states[new_state].init()
       end)
+
+   elseif transition_type == "wipe_to_black_to_state" then
+      global.transition_step=0
+      create_timer(0.05,function() 
+                      global.transition_step = global.transition_step + 1
+      end, {}, 64, function()  
+                      if func ~= nil then
+                         func(unpack(args))
+                      end                       
+                      global.state=new_state
+                      global.states[new_state].init()
+                      create_timer(0.01,function() 
+                                      global.transition_step = global.transition_step - 1
+                      end, {}, 64, function()                         
+                                      global.transition_step=0
+                                      global.transition_reset_screen=true
+                      end)                         
+      end)
+   elseif transition_type == "wipe_to_state" then
+      global.transition_step=64
+      global.state=new_state
+      global.states[new_state].init()
+      create_timer(0.01,function() 
+                      global.transition_step = global.transition_step - 1
+      end, {}, 64, function()                          
+                      global.transition_step=0
+                      global.transition_reset_screen=true      
+      end)
+   else
+      global.state=new_state
+      global.states[new_state].init()
    end
 end
 
@@ -68,19 +100,23 @@ function _update60()
 end
 
 function _draw()
+
    cls()
+
    if global.debug then
       rect(0,0,const.screen.max_x-1,const.screen.max_y-1, const.colors.red)
    end
 
-   if global.transition_track > 0 then
-      clip(global.transition_track,global.transition_track,
-           const.screen.max_x-(2*global.transition_track),
-           const.screen.max_y-(2*global.transition_track))
+
+   if global.transition_step > 0 then
+      clip(global.transition_step,global.transition_step,
+           const.screen.max_x-(2*global.transition_step),
+           const.screen.max_y-(2*global.transition_step))
    end
-   if global.transition_end then
+   
+   if global.transition_reset_screen then
       clip()
-      global.transition_end = false
+      global.transition_reset_screen = false
    end
 
    global.states[global.state].draw()

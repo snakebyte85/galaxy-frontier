@@ -11,7 +11,7 @@ enemy_class = {
    sprite_number=nil,
    sprite_size={w=1,h=1},
    sprite_offset={x=-4,y=-4},
-   timers={},
+   enemy_timers={},
    hit=false,
    init=function(self)
 
@@ -23,12 +23,12 @@ enemy_class = {
          self:dead()         
       else       
          self.hit = true
-         local timer = create_timer(0.1, 
+         local enemy_timer = create_timer(0.1, 
                       function(this_enemy) 
                          this_enemy.hit = false
                       end,
                       {self})
-         add(timers,timer)         
+         add(self.enemy_timers,enemy_timer)         
       end
    end,
    dead=function(self)
@@ -36,8 +36,8 @@ enemy_class = {
       self:dispose()
    end,
    dispose=function(self)
-      for timer in all(timers) do
-         stop_timer(timer)
+      for enemy_timer in all(enemy_timers) do
+         stop_timer(enemy_timer)
       end
       del(enemies,self)
    end,

@@ -1,7 +1,7 @@
 timers = {}
 
 
-function create_timer(delay, func, args, loop)
+function create_timer(delay, func, args, loop, func_end_loop, args_end_loop)
 
    local timer = {
       time = delay,
@@ -9,6 +9,8 @@ function create_timer(delay, func, args, loop)
       func = func,
       args = args or {},
       loop = loop or false,
+      func_end_loop = func_end_loop or func,
+      args_end_loop = args_end_loop or args or {},
       passed = false
    }
 
@@ -26,14 +28,26 @@ function timers_update()
       if time() >= timer.time_exec then
 
          if timer.func ~= nil then
-            timer.func(unpack(timer.args))
-         end
-
-         if type(timer.loop) == "boolean" and timer.loop == true then
-            timer.time_exec = time() + timer.time
-         elseif type(timer.loop) == "number" and timer.loop > 1 then
-            timer.loop = timer.loop -1
-            timer.time_exec = time() + timer.time
+            if type(timer.loop) == "number" then
+               log(timer.loop)
+               timer.loop = timer.loop -1
+               if timer.loop == 0 then
+                  timer.func_end_loop(unpack(timer.args_end_loop))
+                  add(timers_to_delete, timer)
+                  timer.passed = true
+               else                
+                  timer.func(unpack(timer.args))
+                  timer.time_exec = time() + timer.time
+               end
+            else 
+               timer.func(unpack(timer.args))
+               if type(timer.loop) == "boolean" and timer.loop == true then
+                  timer.time_exec = time() + timer.time
+               else
+                  add(timers_to_delete, timer)
+                  timer.passed = true
+               end            
+            end
          else
             add(timers_to_delete, timer)
             timer.passed = true
