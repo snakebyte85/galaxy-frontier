@@ -9,52 +9,62 @@ __lua__
 #include player.lua
 #include particles.lua
 #include space.lua
-
+#include ui.lua
+#include game.lua
+#include title.lua
+#include splash.lua
 
 global={
-   step=0,
    debug=false,
-   log=false
+   log=true,
+   state="splash",
+   states={
+      game={
+         init=game_init,
+         update=game_update,
+         draw=game_draw
+      },
+      title={
+         init=title_init,
+         update=title_update,
+         draw=title_draw
+      },
+      splash={
+         init=splash_init,
+         update=splash_update,
+         draw=splash_draw
+      }   
+   },
+   transition_track=0,
+   transition_end=false
 }
 
+function change_state(new_state, transition)
+   if not transition then
+      global.state=new_state
+      global.states[new_state].init()
+   else 
+      global.transition_track=0
+      global.transition_timer = create_timer(0.01,function() 
+                      global.transition_track = global.transition_track + 1
+      end, {}, 64)
+      create_timer(1,function()
+                      stop_timer(global.transition_timer)
+                      global.transition_end=true
+                      global.transition_track=0
+                      global.state=new_state
+                      global.states[new_state].init()
+      end)
+   end
+end
+
 function _init()
-   global.step=0
-   space_init()
-   player_init()
-   true_btnp_init()
-   enemy_raider_class:new({x=63,y=-10,
-                     waypoints={
-                          {x=63,y=10},
-                          {x=118,y=63, bc={x=128,y=0,num=10} },
-                          {x=63,y=118, bc={x=128,y=128,num=10} },
-                          {x=10,y=63,  bc={x=0,y=128,num=10} },
-                          {x=63,y=10,  bc={x=0,y=0,num=10} }
-                          }
-   })
-   enemy_raider_class:new({x=63,y=63})                          
-   enemy_drone_class:new({x=20,y=20})                          
-   enemy_drone_class:new({x=40,y=40})                          
-   enemy_frigate_class:new({x=30,y=30})
-   enemy_bomber_class:new({x=100,y=100})
-   particle_sun_class:new({x=30,y=100})
-   particle_supernova_class:new({x=50,y=50})
-   particle_earth_class:new({x=10, y=-10})
-   particle_moon_class:new({x=40, y=-10})
-   particle_jupiter_class:new({x=80, y=-10})
+   change_state(global.state)
 end
 
 function _update60()
    timers_update()
-   true_btnp_update()
-   player_update()
-   enemies_update()
-   projectiles_update()
-   particles_update()
-
-   player_check_collision()
-   player_projectiles_check_collision()
-
-   global.step = global.step + 1
+   global.states[global.state].update()
 end
 
 function _draw()
@@ -62,10 +72,19 @@ function _draw()
    if global.debug then
       rect(0,0,const.screen.max_x-1,const.screen.max_y-1, const.colors.red)
    end
-   particles_draw()
-   enemies_draw()
-   player_draw()
-   projectiles_draw()
+
+   if global.transition_track > 0 then
+      clip(global.transition_track,global.transition_track,
+           const.screen.max_x-(2*global.transition_track),
+           const.screen.max_y-(2*global.transition_track))
+   end
+   if global.transition_end then
+      clip()
+      global.transition_end = false
+   end
+
+   global.states[global.state].draw()
+
 end
 
 __gfx__

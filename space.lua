@@ -19,6 +19,7 @@ function create_star(x,y)
    particle_class:new({
          x=x or flr(rnd(127)),
          y=y or 0,
+         z=0,
          speed=speed,
          direction=const.direction.down,
          color=color,
@@ -36,6 +37,7 @@ function create_star(x,y)
 end
 
 particle_planet_class=particle_class:new_class({
+      z=1,
       speed=space.speed_y * 0.05,
       direction=const.direction.down,
       init=function(self)
@@ -45,7 +47,6 @@ particle_planet_class=particle_class:new_class({
       dispose=function(self)
          particle_class.dispose(self)
          del(space.planets,self)
-         create_star()
       end
 })
 
@@ -93,4 +94,5 @@ function space_init()
       create_star(flr(rnd(127)), flr(rnd(127)))
    end   
 end
+
 

@@ -7,7 +7,7 @@ function create_timer(delay, func, args, loop)
       time = delay,
       time_exec = time() + delay,
       func = func,
-      args = args,
+      args = args or {},
       loop = loop or false,
       passed = false
    }
@@ -25,15 +25,14 @@ function timers_update()
    for timer in all(timers) do
       if time() >= timer.time_exec then
 
-         if timer.args == nil then
-            timer.args = {}
-         end
-
          if timer.func ~= nil then
             timer.func(unpack(timer.args))
          end
 
-         if timer.loop then
+         if type(timer.loop) == "boolean" and timer.loop == true then
+            timer.time_exec = time() + timer.time
+         elseif type(timer.loop) == "number" and timer.loop > 1 then
+            timer.loop = timer.loop -1
             timer.time_exec = time() + timer.time
          else
             add(timers_to_delete, timer)

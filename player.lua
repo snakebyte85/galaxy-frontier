@@ -14,13 +14,6 @@ player={
    }
 }
 
-function player_init()
-
-   player.x = 30
-   player.y = 80
-   player.moving = false
-
-end
 
 function player_check_collision()
 

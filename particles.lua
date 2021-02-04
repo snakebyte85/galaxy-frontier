@@ -1,8 +1,15 @@
 particles = {}
 
+particles_draw_order = {}
+
+for i=1,30 do
+   add(particles_draw_order,{})
+end
+
 particle_class = {
       x=0,
       y=0,
+      z=10,
       direction=nil,
       pattern="line",
       time_of_birth=nil,
@@ -22,6 +29,7 @@ particle_class = {
       end,
       dispose=function(self)
          del(particles,self)
+         del(particles_draw_order[self.z+1], self)
       end,
       update=function(self)
          self.speed = self.speed + self.acceleration
@@ -69,6 +77,7 @@ particle_class = {
          self.__index = self
          o=setmetatable(o or {}, self)
          add(particles,o)
+         add(particles_draw_order[o.z+1],o)
          o:init()
          return o
       end,
@@ -114,7 +123,16 @@ end
 
 
 function particles_draw()
-   for particle in all(particles) do
-      particle:draw()
+   for i=1,#particles_draw_order do
+      for particle in all(particles_draw_order[i]) do
+         particle:draw()
+      end
    end
 end
+
+function particles_clear()
+   for particle in all(particles) do
+      particle:dispose()
+   end
+end
+   

@@ -1,28 +1,4 @@
-btn_new={}
-btn_press={}
 
-function true_btnp_init()
-   for i=0,5 do
-      btn_new[i]=false
-      btn_press[i]=false
-   end
-end
-
-function true_btnp_update()
-   for i=0,5 do
-      if btn(i) then
-         btn_new[i]=not btn_press[i]
-         btn_press[i]=true
-      else
-         btn_new[i]=false
-         btn_press[i]=false
-      end
-   end
-end
-
-function true_btnp(key)
-   return btn_new[key]
-end
 
 function lv(v1,v2,t)
     return (1-t)*v1+t*v2
@@ -96,7 +72,6 @@ function rect_hitboxes_collision_check(hitbox1,hitbox2)
    local c2 = hitbox1.x2 >= hitbox2.x1
    local c3 = hitbox1.y1 <= hitbox2.y2
    local c4 = hitbox1.y2 >= hitbox2.y1
-   log(tostring(c1)..tostring(c2)..tostring(c3)..tostring(c4))
    return c1 and c2 and c3 and c4
 end
 
