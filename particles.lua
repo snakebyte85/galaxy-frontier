@@ -32,14 +32,14 @@ particle_class = {
          del(particles_draw_order[self.z+1], self)
       end,
       update=function(self)
-         self.speed = self.speed + self.acceleration
+         self.speed = self.speed + (self.acceleration*delta_time())
          if self.speed < 0 then
             self.speed = 0
          end
 
          if self.pattern == nil or self.pattern == "line" then
-            local mov_x = self.speed * cos(self.direction)
-            local mov_y = self.speed * sin(self.direction)
+            local mov_x = (self.speed*delta_time()) * cos(self.direction)
+            local mov_y = (self.speed*delta_time()) * sin(self.direction)
             self.x = self.x + mov_x
             self.y = self.y + mov_y         
          elseif self.pattern == "wave" then
@@ -49,7 +49,7 @@ particle_class = {
                self.origin_y = self.y
                self.wave_x = random(0,10)
             else
-               self.wave_x = self.wave_x + self.speed
+               self.wave_x = self.wave_x + (self.speed*delta_time())
             end
 
             local temp_x = self.wave_x
@@ -98,8 +98,8 @@ function create_particle_explosion(x,y)
          direction=direction,
          pattern="line",
          life_time=0.8,      
-         speed=random(0.4,0.8),
-         acceleration=-random(0.01,0.02),
+         speed=random(20,40),
+         acceleration=-random(20,40),
          color=const.colors.dark_blue
       }
 

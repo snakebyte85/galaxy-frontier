@@ -8,7 +8,7 @@ group_projectiles={
 projectile_class={
    x=0,
    y=0,
-   speed=2,
+   speed=200,
    direction=nil,
    hitbox={},
    group="enemy",
@@ -25,8 +25,8 @@ projectile_class={
       del(group_projectiles[self.group],self)
    end,
    update=function(self)
-      local mov_x = self.speed * cos(self.direction)
-      local mov_y = self.speed * sin(self.direction)
+      local mov_x = (self.speed*delta_time()) * cos(self.direction)
+      local mov_y = (self.speed*delta_time()) * sin(self.direction)
       self.x = self.x + mov_x
       self.y = self.y + mov_y
    end,

@@ -12,79 +12,77 @@ __lua__
 #include ui.lua
 #include game.lua
 #include title.lua
+#include summary.lua
 #include splash.lua
+#include levels.lua
 
 global={
    debug=false,
-   log=true,
+   log=false,
    state="splash",
    states={
       game={
          init=game_init,
+         dispose=game_dispose,
          update=game_update,
          draw=game_draw
       },
       title={
          init=title_init,
+         dispose=title_dispose,
          update=title_update,
          draw=title_draw
       },
       splash={
          init=splash_init,
+         dispose=splash_dispose,
          update=splash_update,
          draw=splash_draw
-      }   
+      },
+      summary={
+         init=summary_init,
+         dispose=summary_dispose,
+         update=summary_update,
+         draw=summary_draw
+      }
    },
    transition_step=0,
    transition_reset_screen=false
 }
 
-function change_state(new_state, transition_type, func, args)
+function change_state(new_state, transition_type)
 
    args = args or {}
 
    if transition_type == "wipe_to_black" then
       global.transition_step=0
-      create_timer(0.05,function() 
+      create_timer(0.02,function() 
                       global.transition_step = global.transition_step + 1
       end, {}, 64, function()                
-                      if func ~= nil then
-                         func(unpack(args))
-                      end
                       global.transition_step=0
                       global.transition_reset_screen=true
+                      global.states[global.state].dispose()
                       global.state=new_state
                       global.states[new_state].init()
       end)
 
    elseif transition_type == "wipe_to_black_to_state" then
       global.transition_step=0
-      create_timer(0.05,function() 
+      create_timer(0.02,function() 
                       global.transition_step = global.transition_step + 1
       end, {}, 64, function()  
-                      if func ~= nil then
-                         func(unpack(args))
-                      end                       
+                      global.states[global.state].dispose()
                       global.state=new_state
                       global.states[new_state].init()
-                      create_timer(0.01,function() 
+                      create_timer(0.02,function() 
                                       global.transition_step = global.transition_step - 1
                       end, {}, 64, function()                         
                                       global.transition_step=0
                                       global.transition_reset_screen=true
                       end)                         
       end)
-   elseif transition_type == "wipe_to_state" then
-      global.transition_step=64
-      global.state=new_state
-      global.states[new_state].init()
-      create_timer(0.01,function() 
-                      global.transition_step = global.transition_step - 1
-      end, {}, 64, function()                          
-                      global.transition_step=0
-                      global.transition_reset_screen=true      
-      end)
    else
+      global.states[global.state].dispose()
       global.state=new_state
       global.states[new_state].init()
    end

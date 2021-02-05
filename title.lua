@@ -1,12 +1,20 @@
 function title_init()
+   title_exiting = false
    space_init()
-   particle_sun_class:new({x=20,y=110})
+   particle_sun_class:new({x=20,y=20})
+end
+
+function title_dispose()
+   space_clear()
 end
 
 function title_update()
    particles_update()
-   if btn(const.input.o) or btn(const.input.z) then
-      change_state("game", "wipe_to_black")
+   if title_exiting == false and (btn(const.input.o) or btn(const.input.z)) then
+      title_exiting = true
+      player.lives=3
+      game_load_level(level_galaxy1)
+      change_state("summary", "wipe_to_black")      
    end
 end
 

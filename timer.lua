@@ -2,15 +2,14 @@ timers = {}
 
 
 function create_timer(delay, func, args, loop, func_end_loop, args_end_loop)
-
    local timer = {
       time = delay,
       time_exec = time() + delay,
       func = func,
       args = args or {},
       loop = loop or false,
-      func_end_loop = func_end_loop or func,
-      args_end_loop = args_end_loop or args or {},
+      func_end_loop = func_end_loop,
+      args_end_loop = args_end_loop or {},
       passed = false
    }
 
@@ -29,7 +28,6 @@ function timers_update()
 
          if timer.func ~= nil then
             if type(timer.loop) == "number" then
-               log(timer.loop)
                timer.loop = timer.loop -1
                if timer.loop == 0 then
                   timer.func_end_loop(unpack(timer.args_end_loop))

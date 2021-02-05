@@ -1,31 +1,62 @@
+game_level_wait_for_enemies = false
+game_level_wait_end_time = 0
+
+function game_load_level(level)
+   game_level = level
+   game_level_position = 0
+   game_level_checkpoint = 0
+end
+
 function game_init()
    ui_init()
    space_init()
-   player.x = 30
-   player.y = 80
-   player.moving = false
-   enemy_raider_class:new({x=63,y=-10,
-                     waypoints={
-                          {x=63,y=10},
-                          {x=118,y=63, bc={x=128,y=0,num=10} },
-                          {x=63,y=118, bc={x=128,y=128,num=10} },
-                          {x=10,y=63,  bc={x=0,y=128,num=10} },
-                          {x=63,y=10,  bc={x=0,y=0,num=10} }
-                          }
-   })
-   enemy_raider_class:new({x=63,y=63})                          
-   enemy_drone_class:new({x=20,y=20})                          
-   enemy_drone_class:new({x=40,y=40})                          
-   enemy_frigate_class:new({x=30,y=30})
-   enemy_bomber_class:new({x=100,y=100})
-   particle_sun_class:new({x=30,y=100})
-   particle_supernova_class:new({x=50,y=50})
-   particle_earth_class:new({x=10, y=-10})
-   particle_moon_class:new({x=40, y=-10})
-   particle_jupiter_class:new({x=80, y=-10})
+   player.dead=false
+   player.health=3
+   player.x = 60
+   player.y = 100
+end
+
+function game_dispose()
+   space_clear()
+   enemies_clear()
+end
+
+function game_level_update()
+
+   if game_level_position < #game_level.content then
+
+      if game_level_wait_for_enemies then
+         if #enemies == 0 then
+            game_level_wait_for_enemies = false
+         end
+      elseif time() > game_level_wait_end_time then
+         game_level_position = game_level_position + 1
+         local current_position = game_level.content[game_level_position]
+         if #current_position == 1 and type(current_position[1]) == "number" then
+
+            if current_position[1] < 0 then
+               game_level_checkpoint = game_level_position            
+            elseif current_position[1] == 0 then
+               game_level_wait_for_enemies = true
+            else
+               game_level_wait_end_time = time() + current_position[1]
+            end
+         elseif #current_position == 2 and type(current_position[1]) == "function" then
+            current_position[1](unpack(current_position[2]))
+         elseif #current_position == 3 and type(current_position[1]) == "table" then
+            current_position[1][current_position[2]](current_position[1],table_clone(current_position[3]))
+         end
+      end
+   end
+end
+
+function game_player_dead() 
+   game_level_position = game_level_checkpoint
+   change_state("summary")
 end
 
 function game_update()
+   game_level_update()
    ui_update()
    player_update()
    enemies_update()
@@ -44,3 +75,6 @@ function game_draw()
    projectiles_draw()
    ui_draw()
 end
+
+
+

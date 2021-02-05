@@ -131,3 +131,21 @@ function log(str)
       printh(tostring(str), "galaxy.log")
    end
 end
+
+function table_clone(t)
+   local result = {}
+   for k, v in pairs(t) do
+      if type(v) == "table" then
+         result[k] = table_clone(v)
+      else
+         result[k] = v
+      end
+   end
+   return result
+end
+
+function delta_time()
+   return 1/stat(7)
+end
+
+

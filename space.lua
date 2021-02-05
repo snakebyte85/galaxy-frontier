@@ -1,5 +1,5 @@
 space={
-   speed_y=1,
+   speed_y=50,
    stars_count=50,
    stars={},
    planets={}
@@ -31,6 +31,10 @@ function create_star(x,y)
             particle_class.dispose(self)
             del(space.stars,self)
             create_star()
+         end,
+         real_dispose=function(self)
+            particle_class.dispose(self)
+            del(space.stars,self)
          end
    })
 
@@ -97,7 +101,7 @@ end
 
 function space_clear()
    for star in all(space.stars) do
-      star:dispose()
+      star:real_dispose()
    end
 
    for planet in all(space.planets) do

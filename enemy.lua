@@ -4,7 +4,7 @@ enemy_class = {
    x=0,
    y=0,
    waypoints={},
-   speed=1,
+   speed=30,
    health=5,
    hitbox={},
    ttype=nil,
@@ -31,7 +31,7 @@ enemy_class = {
          add(self.enemy_timers,enemy_timer)         
       end
    end,
-   dead=function(self)
+   dead=function(self)      
       create_particle_explosion(self.x,self.y)
       self:dispose()
    end,
@@ -83,8 +83,8 @@ function update_regular_enemy(enemy)
          if next_wp_bc == nil then              
             local direction = atan2(next_wp_x-enemy.x, next_wp_y-enemy.y)
             local speed_to_apply = sqrt((next_wp_x-enemy.x)^2 + (next_wp_y-enemy.y)^2)
-            if enemy.speed < speed_to_apply then
-               speed_to_apply = enemy.speed
+            if (enemy.speed*delta_time()) < speed_to_apply then
+               speed_to_apply = enemy.speed*delta_time()
             end
             mov_x = speed_to_apply * cos(direction)
             mov_y = speed_to_apply * sin(direction)
@@ -103,12 +103,17 @@ function update_regular_enemy(enemy)
          end
       end
       enemy.x = enemy.x + mov_x
-      enemy.y = enemy.y + mov_y      
+      enemy.y = enemy.y + mov_y   
+
+      if (enemy.x > const.screen.max_x + 10 or enemy.x < -10 or
+          enemy.y > const.screen.max_y + 10 or enemy.y < -10) then   
+         enemy:dispose()
+      end
    end
 end
 
 enemy_raider_class = enemy_class:new_class({
-      speed=1,
+      speed=30,
       health=5,
       hitbox={x1=-4,y1=-4,x2=3,y2=2,ttype="rect"},
       ttype = "raider",
@@ -116,7 +121,7 @@ enemy_raider_class = enemy_class:new_class({
 })
 
 enemy_drone_class= enemy_class:new_class({
-      speed=1,
+      speed=20,
       health=10,
       hitbox={x1=-4,y1=-4,x2=3,y2=3,ttype="rect"},
       ttype= "drone",
@@ -140,7 +145,7 @@ enemy_drone_class= enemy_class:new_class({
 })
 
 enemy_frigate_class = enemy_class:new_class({
-      speed=0.5,
+      speed=10,
       health=20,
       hitbox={x1=-10,y1=-4,x2=9,y2=2,ttype="rect"},
       ttype = "frigate",
@@ -154,7 +159,7 @@ enemy_bomber_class=enemy_class:new_class({
       x=x,
       y=y,
       waypoints=waypoints,
-      speed=1,
+      speed=20,
       health=9,
       hitbox={x1=-4,y1=-4,x2=3,y2=3,ttype="rect"},
       ttype = "bomber",
@@ -199,6 +204,12 @@ end
 function enemies_update()
    for enemy in all(enemies) do
       enemy:update()
+   end
+end
+
+function enemies_clear()
+   for enemy in all(enemies) do
+      enemy:dispose()
    end
 end
 

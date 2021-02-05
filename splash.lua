@@ -1,24 +1,27 @@
-splash_snake={
-   {8,8},
-}
-
-splash_waypoints={
-   {28,28},
-   {16,36},
-   {30,30},
-   {18,30},
-   {18,24},
-   {30,24}
-}
-
 splash_title1 = "nakebyte"
 splash_title2 = "games"
 
-splash_title_letters = 0
-
 function splash_init()
+   splash_title_letters = 0
+
+   splash_snake={
+      {8,8},
+   }
+
+   splash_waypoints={
+      {28,28},
+      {16,36},
+      {30,30},
+      {18,30},
+      {18,24},
+      {30,24}
+   }
    splash_next_update = time() + 0.03
    splash_new_cell_count=14
+end
+
+function splash_dispose()
+
 end
 
 function splash_show_title()
