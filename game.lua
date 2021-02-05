@@ -58,21 +58,11 @@ end
 function game_update()
    game_level_update()
    ui_update()
-   player_update()
-   enemies_update()
-   projectiles_update()
-   particles_update()
-
-   player_check_collision()
-   player_projectiles_check_collision()
-
+   entities_update()
 end
 
 function game_draw()
-   particles_draw()
-   enemies_draw()
-   player_draw()
-   projectiles_draw()
+   entities_draw()
    ui_draw()
 end
 

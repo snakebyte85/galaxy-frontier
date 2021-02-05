@@ -1,4 +1,7 @@
 function summary_init()
+
+   ui_init()
+
    if player.lives > 0 then
       create_timer(3,function()
                       change_state("game")
@@ -19,6 +22,9 @@ function summary_update()
 end
 
 function summary_draw()
+
+   ui_draw()
+
    if player.lives > 0 then
       print(game_level.name, 45, 50, const.colors.white)
       spr(1, 48, 78)

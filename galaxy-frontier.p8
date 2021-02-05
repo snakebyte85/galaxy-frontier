@@ -4,6 +4,7 @@ __lua__
 #include constants.lua
 #include util.lua
 #include timer.lua
+#include entity.lua
 #include projectiles.lua
 #include enemy.lua
 #include player.lua
