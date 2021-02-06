@@ -95,8 +95,8 @@ function pal_all_white()
    end
 end
 
-function random(min, max)
-   return min + rnd(max-min)
+function random(a, b)
+   return min(a,b) + rnd(max(a,b)-min(a,b))
 end
 
 function tostring(any)
@@ -149,3 +149,10 @@ function delta_time()
 end
 
 
+function on_screen(x,y,delta)
+
+   delta = delta or 0
+
+   return x + delta >= 0 and x - delta <= const.screen.max_x and
+      y + delta >= 0 and y - delta <= const.screen.max_y
+end

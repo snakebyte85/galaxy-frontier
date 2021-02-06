@@ -1,7 +1,11 @@
+powerups = {} 
+
 player=entity_class:new{
    z=19,
    lives=3,
    health=3,
+   max_health=3,
+   powerup_speed=0,
    hitbox={x1=-4,y1=-4,x2=3,y2=2,ttype="rect"},
    moving=false,
    invincible=false,
@@ -9,6 +13,13 @@ player=entity_class:new{
    score=0,
    sprite_number=1,
    sprites_moving={2,3},
+   reset=function(self)
+      self.health=3
+      self.dead=false
+      self.x=60
+      self.y=100
+      self.powerup_speed=0         
+   end,
    dispose=function(self)
       -- no
    end,
@@ -37,7 +48,7 @@ player=entity_class:new{
          
          if self.direction ~= nil then
             self.moving = true
-            self.speed = 30
+            self.speed = 40
          else
             sprite_number = 1
          end
@@ -63,6 +74,10 @@ player=entity_class:new{
                color=color
             }
             self.timer_ember_cooldown = create_timer(0.1)      
+         end
+
+         if self.speed ~= 0 then
+            self.speed = self.speed + self.powerup_speed
          end
 
          entity_class.update(self)
@@ -115,14 +130,27 @@ function player_check_collision()
       end
 
       if not hit_by_enemy then
-         for enemy_projectile in all(enemy_projectiles) do      
+         for enemy_projectile in all(group_projectiles.enemy) do      
             if entities_collision_check(player,enemy_projectile) then
                player_hit()
-               del(projectiles, enemy_projectile)
-               del(enemy_projectiles, enemy_projectile)
+               enemy_projectile:dispose()
                break
             end   
          end
+         for neutral_projectile in all(group_projectiles.neutral) do      
+            if entities_collision_check(player,neutral_projectile) then
+               player_hit()
+               neutral_projectile:dispose()
+               break
+            end   
+         end
+      end
+   end
+      
+   for powerup in all(powerups) do
+      if entities_collision_check(player,powerup) then
+         powerup:picked_up_by_player()
+         powerup:dispose()
       end
    end
 end
@@ -140,4 +168,125 @@ function player_hit()
                 function()
                    player.invincible = false
                 end)
+end
+
+powerup_class=entity_class:new_class{
+   score=10,
+   pattern="line",
+   direction=const.direction.down,
+   speed=20,
+   hitbox={x1=-4,y1=-4,x2=3,y2=3,ttype="rect"},
+   init=function(self)
+      entity_class.init(self)
+      add(powerups,self)
+   end,
+   picked_up_by_player=function(self) 
+      player.score = player.score + self.score
+   end,
+   dispose=function(self)
+      entity_class.dispose(self)
+      del(powerups,self)
+   end
+}
+
+powerup_shield_class=powerup_class:new_class{
+   sprite_number=4,
+   picked_up_by_player=function(self)
+      powerup_class.picked_up_by_player(self)
+      if player.health < player.max_health then
+         player.health = player.health + 1
+      end
+   end
+}
+
+powerup_shield_plus_class=powerup_class:new_class{
+   sprite_number=5,
+   picked_up_by_player=function(self)
+      powerup_class.picked_up_by_player(self)
+      if player.max_health < 5  then
+         player.max_health = player.max_health + 1
+      end
+   end
+}
+
+powerup_life_class=powerup_class:new_class{
+   sprite_number=6,
+   picked_up_by_player=function(self)
+      powerup_class.picked_up_by_player(self)
+      player.lives = player.lives+1
+   end
+}
+
+powerup_speed_class=powerup_class:new_class{
+   sprite_number=7,
+   picked_up_by_player=function(self)
+      powerup_class.picked_up_by_player(self)
+      player.powerup_speed = 20
+   end
+}
+
+powerup_phaser_class=powerup_class:new_class{
+   sprite_number=8,
+   picked_up_by_player=function(self)
+      powerup_class.picked_up_by_player(self)
+      --todo
+   end
+}
+
+powerup_ring_class=powerup_class:new_class{
+   sprite_number=9,
+   picked_up_by_player=function(self)
+      powerup_class.picked_up_by_player(self)
+      --todo
+   end
+}
+
+powerup_missile_class=powerup_class:new_class{
+   sprite_number=10,
+   picked_up_by_player=function(self)
+      powerup_class.picked_up_by_player(self)
+      --todo
+   end
+}
+
+powerup_multi_laser_class=powerup_class:new_class{
+   sprite_number=11,
+   picked_up_by_player=function(self)
+      powerup_class.picked_up_by_player(self)
+      --todo
+   end
+}
+
+powerup_coin_class=powerup_class:new_class{
+   score=50,
+   draw=function(self)
+      self.sprite_number = flr(flr(time() / 0.2)%2)+13
+      powerup_class.draw(self)
+   end
+}
+
+function powerup_random(x,y) 
+
+   local number = flr(rnd(6))
+
+   if number == 0 then
+      powerup_shield_class:new({x=x,y=y})
+   elseif number == 1 then
+      powerup_speed_class:new({x=x,y=y})
+   elseif number == 2 then
+      powerup_missile_class:new({x=x,y=y})
+   elseif number == 3 then
+      powerup_phaser_class:new({x=x,y=y})
+   elseif number == 4 then
+      powerup_multi_laser_class:new({x=x,y=y})
+   elseif number == 5 then
+      powerup_ring_class:new({x=x,y=y})
+   end
+
+end
+
+function powerups_clear()
+   for powerup in all(powerups) do
+      powerup:dispose()
+   end
 end

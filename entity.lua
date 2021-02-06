@@ -129,8 +129,7 @@ function update_entity(entity)
    end
       
    if (entity.time_of_death ~=nil and time() > entity.time_of_death) or
-      (entity.x > const.screen.max_x + 10 or entity.x < -10 or
-       entity.y > const.screen.max_y + 10 or entity.y < -10) then   
+      not on_screen(entity.x,entity.y,10) then   
       entity:dispose()
    end
       

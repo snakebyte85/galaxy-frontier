@@ -10,15 +10,15 @@ end
 function game_init()
    ui_init()
    space_init()
-   player.dead=false
-   player.health=3
-   player.x = 60
-   player.y = 100
+   player:reset()
 end
 
 function game_dispose()
-   space_clear()
+   space_clear() 
+   particles_clear()
    enemies_clear()
+   projectiles_clear()
+   powerups_clear()
 end
 
 function game_level_update()

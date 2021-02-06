@@ -6,7 +6,7 @@ group_projectiles={
 }
 
 projectile_class=entity_class:new_class{
-   speed=200,
+   speed=100,
    group="enemy",
    damage=1,
    init=function(self)
@@ -23,9 +23,19 @@ projectile_class=entity_class:new_class{
 
 enemy_laser_projectile_class = projectile_class:new_class({
       hitbox={length=4,ttype="line"},
+      direction=const.direction.down,
+      color=const.colors.red
+})
+
+enemy_bullet_projectile_class = projectile_class:new_class({
+      hitbox={x1=-2,y1=-1,x2=1,y2=2,ttype="rect"},
+      sprite_number=28,
+      sprite_offset={x=-2,y=-1},
+      speed=20
 })
 
 player_laser_projectile_class = projectile_class:new_class({
+      speed=200,
       hitbox={length=4,ttype="line"},
       group="player",
       direction=const.direction.up,
@@ -46,7 +56,7 @@ function player_projectiles_check_collision()
 end
 
 function projectiles_clear()
-   for enemy in all(projectiles) do
+   for projectile in all(projectiles) do
       projectile:dispose()
    end
 end

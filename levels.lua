@@ -23,6 +23,7 @@ level_galaxy1={
       }, 
       {0},
       {-1},
+      {powerup_speed_class,"new",{x=30,y=-10}},
       {3},
       {particle_moon_class,"new",{x=40, y=-10}},
       {3},
