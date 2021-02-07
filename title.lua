@@ -10,7 +10,7 @@ end
 
 function title_update()
    entities_update()
-   if title_exiting == false and (btn(const.input.o) or btn(const.input.z)) then
+   if title_exiting == false and (btn(const.input.o) or btn(const.input.x)) then
       title_exiting = true
       player.lives=3
       player.score=0

@@ -2,6 +2,11 @@ level_galaxy1={
    name="galaxy 1",
    content={
       {particle_supernova_class,"new",{x=50,y=50}},
+      {powerup_multi_laser_class,"new",{x=30,y=-10}},
+      {powerup_missile_class,"new",{x=40,y=-10}},
+      {powerup_shield_plus_class,"new",{x=50,y=-10}},
+      {powerup_shield_plus_class,"new",{x=60,y=-10}},
+      {powerup_life_class,"new",{x=70,y=-10}},
       {3},
       {enemy_raider_class,"new",{x=63,y=-10,
                                  waypoints={
@@ -23,7 +28,7 @@ level_galaxy1={
       }, 
       {0},
       {-1},
-      {powerup_speed_class,"new",{x=30,y=-10}},
+      {powerup_phaser_class,"new",{x=30,y=-10}},
       {3},
       {particle_moon_class,"new",{x=40, y=-10}},
       {3},

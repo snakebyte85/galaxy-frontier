@@ -35,19 +35,14 @@ end
 function ui_draw()
 
    print("shield",2,118, const.colors.white)
-   if player.health >= 1 then
-      rectfill(2,125, 12,127, const.colors.green)
+   local step = flr((34 - (2*(player.max_health-1))) / player.max_health)
+   local tmp = 2
+   for i=1,player.health do
+      rectfill(tmp,125, tmp+step,127, const.colors.green)
+      tmp = tmp + step + 2
    end
 
-   if player.health >= 2 then
-      rectfill(14,125, 24,127, const.colors.green)
-   end
-
-   if player.health >= 3 then
-      rectfill(26,125, 36,127, const.colors.green)
-   end
-
-   local tmp = player.score
+   tmp = player.score
    local padding_zeroes = "0000000000"
    while tmp ~= 0 do
       tmp = flr(tmp/10)
@@ -58,6 +53,20 @@ function ui_draw()
       print(padding_zeroes, 45,123, const.colors.white) 
    else
       print(padding_zeroes..tostring(player.score), 45, 123, const.colors.white)
+   end
+
+   if player.second_weapon.ttype ~= nil then
+      local sprite_number = 0
+      if player.second_weapon.ttype == "phaser" then
+         sprite_number = 8
+      elseif player.second_weapon.ttype == "ring" then
+         sprite_number = 9
+      elseif player.second_weapon.ttype == "missile" then
+         sprite_number = 10
+      end
+      
+      spr(sprite_number, 110,120)
+      print(player.second_weapon.ammo, 120,122)
    end
 
 end

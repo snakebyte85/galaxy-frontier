@@ -42,6 +42,31 @@ player_laser_projectile_class = projectile_class:new_class({
       color=const.colors.green
 })
 
+player_missile_projectile_class = projectile_class:new_class({
+      speed=20,
+      hitbox={x1=-1,y1=-2,x2=1,y2=2,ttype="rect"},
+      group="player",
+      direction=const.direction.up,
+      sprite_number=26,
+      sprite_offset={x=-1,y=-2},
+      damage=5,
+      acceleration=100,
+      draw=function(self)
+         self.sprite_number = flr(flr(time() / 0.2)%2)+26
+         projectile_class.draw(self)
+      end
+})
+
+player_phaser_projectile_class = projectile_class:new_class({
+      speed=100,
+      hitbox={x1=-2,y1=-3,x2=2,y2=3,ttype="rect"},
+      group="player",
+      direction=const.direction.up,
+      sprite_number=29,
+      sprite_offset={x=-2,y=-3},
+      damage=5
+})
+
 function player_projectiles_check_collision()
 
    for player_projectile in all(group_projectiles.player) do

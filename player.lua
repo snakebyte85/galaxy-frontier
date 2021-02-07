@@ -6,6 +6,11 @@ player=entity_class:new{
    health=3,
    max_health=3,
    powerup_speed=0,
+   laser_count=1,
+   second_weapon={
+      ttype=nil,
+      ammo=0
+   },
    hitbox={x1=-4,y1=-4,x2=3,y2=2,ttype="rect"},
    moving=false,
    invincible=false,
@@ -15,10 +20,14 @@ player=entity_class:new{
    sprites_moving={2,3},
    reset=function(self)
       self.health=3
+      self.max_health=3
       self.dead=false
       self.x=60
       self.y=100
       self.powerup_speed=0         
+      self.laser_count=1
+      self.second_weapon.ttype=nil
+      self.second_weapon.ammo=0
    end,
    dispose=function(self)
       -- no
@@ -54,8 +63,42 @@ player=entity_class:new{
          end
          
          if true_btnp(const.input.o) then
-            player_laser_projectile_class:new({x=self.x,y=self.y-2})
+            if self.laser_count == 1 then
+               player_laser_projectile_class:new({x=self.x,y=self.y-2})
+            elseif self.laser_count == 2 then
+               player_laser_projectile_class:new({x=self.x-2,y=self.y-2})
+               player_laser_projectile_class:new({x=self.x+2,y=self.y-2})
+            elseif self.laser_count == 3 then
+               player_laser_projectile_class:new({x=self.x-2,y=self.y-2,direction=0.30})
+               player_laser_projectile_class:new({x=self.x,y=self.y-2})
+               player_laser_projectile_class:new({x=self.x+2,y=self.y-2,direction=0.20})
+            end
          end   
+
+         if true_btnp(const.input.x) and 
+            (self.second_weapon.ttype ~= nil and self.second_weapon.ammo > 0) and
+            (self.timer_second_weapon_cooldown == nil or 
+             self.timer_second_weapon_cooldown.passed) then
+            
+            if self.second_weapon.ttype == "missile" then
+               player_missile_projectile_class:new({x=self.x,y=self.y-2})
+            elseif self.second_weapon.ttype == "phaser" then
+               player_phaser_projectile_class:new({x=self.x,y=self.y-2})
+            elseif self.second_weapon.ttype == "ring" then
+               for dir=0,1,0.05 do                  
+                  player_laser_projectile_class:new({x=self.x,
+                                                     y=self.y,
+                                                     direction=dir,
+                                                     damage=3,
+                                                     color=const.colors.yellow})
+               end
+            end
+            self.second_weapon.ammo = self.second_weapon.ammo - 1
+            if self.second_weapon.ammo == 0 then
+               self.second_weapon.ttype = nil
+            end
+            self.timer_second_weapon_cooldown = create_timer(0.5)
+         end            
 
          if self.moving == true and
             (self.timer_ember_cooldown == nil or
@@ -229,7 +272,12 @@ powerup_phaser_class=powerup_class:new_class{
    sprite_number=8,
    picked_up_by_player=function(self)
       powerup_class.picked_up_by_player(self)
-      --todo
+      if player.second_weapon.ttype=="phaser" then
+         player.second_weapon.ammo = player.second_weapon.ammo + 5
+      else
+         player.second_weapon.ttype="phaser"
+         player.second_weapon.ammo=5
+      end
    end
 }
 
@@ -237,7 +285,12 @@ powerup_ring_class=powerup_class:new_class{
    sprite_number=9,
    picked_up_by_player=function(self)
       powerup_class.picked_up_by_player(self)
-      --todo
+      if player.second_weapon.ttype=="ring" then
+         player.second_weapon.ammo = player.second_weapon.ammo + 5
+      else
+         player.second_weapon.ttype="ring"
+         player.second_weapon.ammo=5
+      end
    end
 }
 
@@ -245,7 +298,12 @@ powerup_missile_class=powerup_class:new_class{
    sprite_number=10,
    picked_up_by_player=function(self)
       powerup_class.picked_up_by_player(self)
-      --todo
+      if player.second_weapon.ttype=="missile" then
+         player.second_weapon.ammo = player.second_weapon.ammo + 5
+      else
+         player.second_weapon.ttype="missile"
+         player.second_weapon.ammo=5
+      end
    end
 }
 
@@ -253,7 +311,17 @@ powerup_multi_laser_class=powerup_class:new_class{
    sprite_number=11,
    picked_up_by_player=function(self)
       powerup_class.picked_up_by_player(self)
-      --todo
+      if player.laser_count ~= 3 then
+         player.laser_count = player.laser_count + 1
+      end
+   end,
+   draw=function(self)
+      if player.laser_count == 1 then
+         self.sprite_number=11
+      else
+         self.sprite_number=12
+      end
+      powerup_class.draw(self)
    end
 }
 
