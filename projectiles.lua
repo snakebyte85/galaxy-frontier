@@ -51,6 +51,16 @@ player_missile_projectile_class = projectile_class:new_class({
       sprite_offset={x=-1,y=-2},
       damage=5,
       acceleration=100,
+      pattern="waypoints",
+      init=function(self)
+         projectile_class.init(self)
+         local sign = (self.direction==const.direction.up) and -1 or 1
+         local target_x = self.x
+         local target_y = self.y + (sign*100)
+         add(self.waypoints, {x=target_x, y=target_y, 
+                              bc={x=target_x+50, y=self.y + (sign*50), num=10}
+                             })
+      end,
       draw=function(self)
          self.sprite_number = flr(flr(time() / 0.2)%2)+26
          projectile_class.draw(self)

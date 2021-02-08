@@ -162,7 +162,7 @@ function draw_entity(entity)
               entity.x+entity.hitbox.x2, entity.y+entity.hitbox.y2,
               const.colors.blue)
       end
-      if entity.waypoints then
+      if entity.pattern == "waypoints" and entity.waypoints ~= nil then
          if #entity.waypoints ~= 0 then
             line(entity.x, entity.y,
                  entity.waypoints[1].x, entity.waypoints[1].y,
