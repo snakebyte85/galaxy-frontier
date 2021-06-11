@@ -18,7 +18,7 @@ __lua__
 #include levels.lua
 
 global={
-   debug=true,
+   debug=false,
    log=false,
    state="splash",
    states={
